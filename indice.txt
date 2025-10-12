@@ -1,0 +1,17 @@
+﻿Create-MailStoreTask.ps1
+	Creates a XML file with the task configuration and load it
+mailstore_runallprofiles.xml
+	File example of task configuration
+	You can personalized and import
+RunAllProfiles.bat
+	Not finished
+	Run profiles one by one
+	Log and use SendMail.ps1 to send the result
+	Wait for the process to finish
+SendMail.ps1
+	Not tested, just a scrtach
+test_run_all_profiles.bat
+	Just for test purposes
+WaitForMailStoreIdle.ps1
+	Try to guess when MailStore finishes with the porfile archive
+
