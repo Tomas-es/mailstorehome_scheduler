@@ -1,5 +1,6 @@
 ﻿Create-MailStoreTask.ps1
 	Creates a XML file with the task configuration and load it
+	To do: Check it starts at login by default
 mailstore_runallprofiles.xml
 	File example of task configuration
 	You can personalized and import
