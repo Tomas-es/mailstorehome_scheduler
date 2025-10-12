@@ -155,7 +155,7 @@ $xml = @"
     <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
     <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
     <AllowHardTerminate>true</AllowHardTerminate>
-    <StartWhenAvailable>true</StartWhenAvailable>
+  <StartWhenAvailable>false</StartWhenAvailable>
     <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
     <IdleSettings>
       <StopOnIdleEnd>false</StopOnIdleEnd>
@@ -199,7 +199,7 @@ if ($Register){
     $runLevelValue = 'Limited'
   }
   $principal = New-ScheduledTaskPrincipal -UserId $UserId -LogonType $LogonType -RunLevel $runLevelValue
-  $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+  $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -WakeToRun -ExecutionTimeLimit (New-TimeSpan -Hours 2)
 
   $task = New-ScheduledTask -Action $action -Trigger $trigger1,$trigger2 -Principal $principal -Settings $settings -Description "Runs all MailStore Home archive profiles sequentially."
 
