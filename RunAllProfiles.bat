@@ -56,9 +56,9 @@ for %%P in (%PROFILES%) do (
     echo started archive -id="%%~P"
     timeout /t 5 /nobreak
         (
-        echo %ERRORLEVEL% is always 0 because it starts the program,
+        echo ERRORLEVEL=%ERRORLEVEL% is always 0 because it starts the program,
         echo but not the profile itself if it does not exist.
-        echo. 
+        echo
         echo For a proper log and result confirmation use the MailStore GUI
         echo and check the profile log there.
     ) >> "!LOGFILE!" 2>&1
