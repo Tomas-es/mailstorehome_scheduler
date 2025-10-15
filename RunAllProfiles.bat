@@ -58,10 +58,10 @@ for %%P in (%PROFILES%) do (
     ) >> "!LOGFILE!"
 
     rem Run MailStore command line
+    echo Starting MailStore profile %%~P >> "!LOGFILE!" 2>&1
     start "" %MAILSTORE% /c archive -id="%%~P"
-    rem You never get this line because last one waits for the user to close MailStore.
-    echo started archive -id="%%~P"
     timeout /t 5 /nobreak
+    rem Note: ERRORLEVEL is always 0 here because 'start' launches the program and returns immediately.
         (
         echo ERRORLEVEL=%ERRORLEVEL% is always 0 because it starts the program,
         echo but not the profile itself if it does not exist.
