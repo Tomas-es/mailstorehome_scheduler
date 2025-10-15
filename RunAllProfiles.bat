@@ -30,6 +30,13 @@ if not exist "%MAILSCRIPT%" (
     exit /b 1
 )
 
+rem Last exited
+if exist %MAILSTORE%\*.lock (
+    echo  WARNING: Last MailStore exit was not clean. A .lock file exists in %MAILSTORE%.
+    echo  This may indicate that MailStore is already running or was not closed properly.
+    exit /b 1
+)
+
 rem List of profile IDs to run (space-separated)
 set "PROFILES=1"
 rem Date format: YYYY-MM-DD_HH-MM-SS
