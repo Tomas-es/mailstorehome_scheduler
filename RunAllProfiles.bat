@@ -31,8 +31,15 @@ if not exist "%MAILSCRIPT%" (
     exit /b 1
 )
 
+rem MailStore data directory
+if not exist "%MAILSTOREDATA%" (
+    echo ERROR: MailStore data directory not found: "%MAILSTOREDATA%"
+    echo Please verify MailStore is installed and the path is correct.
+    exit /b 1
+)
+
 rem Last exited
-if exist %MAILSTORE%\*.lock (
+if exist %MAILSTOREDATA%\*.lock (
     echo  WARNING: Last MailStore exit was not clean. A .lock file exists in %MAILSTORE%.
     echo  This may indicate that MailStore is already running or was not closed properly.
     exit /b 1
