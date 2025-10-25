@@ -42,7 +42,7 @@ rem Last exited
 if exist %MAILSTOREDATA%\*.lock (
     echo  WARNING: Last MailStore exit was not clean. A .lock file exists in %MAILSTORE%.
     echo  This may indicate that MailStore is already running or was not closed properly.
-    exit /b 1
+    set LOCKFOUND=Last MailStore exit was not clean
 )
 
 rem List of profile IDs to run (space-separated)
@@ -59,6 +59,7 @@ rem === Loop through profiles ===
 for %%P in (%PROFILES%) do (
     set "PROFILE=%%~P"
     set "LOGFILE=%LOGDIR%\PROFILE_%%~P_%DATESTAMP%.log"
+    echo %LOCKFOUND%> "!LOGFILE!" 2>&1
 
     (
         echo ======================================================
