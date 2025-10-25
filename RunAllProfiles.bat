@@ -5,6 +5,7 @@ rem === Configuration ===
 set MAILSTORE="C:\Program Files (x86)\MailStore\MailStore Home\MailStoreHome.exe"
 set LOGDIR=C:\MailStore\Logs
 set MAILSCRIPT=C:\MailStore\SendMail.ps1
+set "MAILSTOREDATA=%USERPROFILE%\Documents\MailStore Home"
 
 rem === Verify configured paths exist ===
 rem MailStore executable
@@ -79,8 +80,8 @@ for %%P in (%PROFILES%) do (
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
-    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 120'
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30
+    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 120'
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 30
 
     if errorlevel 1 (
       echo WARNING: Wait for MailStore profile %%~P timed out or failed >> "!LOGFILE!"
