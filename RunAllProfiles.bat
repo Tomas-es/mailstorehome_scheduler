@@ -39,6 +39,7 @@ if exist %MAILSTORE%\*.lock (
 
 rem List of profile IDs to run (space-separated)
 set "PROFILES=1"
+set idleSec=10
 rem Date format: YYYY-MM-DD_HH-MM-SS
 set DATESTAMP=%DATE:~-4%-%DATE:~3,2%-%DATE:~0,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~6,2%
 rem Replace space with 0 in hour if needed, so there are always two digits and no leading space
@@ -63,7 +64,7 @@ for %%P in (%PROFILES%) do (
     timeout /t 5 /nobreak
     rem Note: ERRORLEVEL is always 0 here because 'start' launches the program and returns immediately.
         (
-        echo ERRORLEVEL=%ERRORLEVEL% is always 0 because it starts the program,
+        echo ERRORLEVEL=%ERRORLEVEL%. It is always 0 because it starts the program,
         echo but not the profile itself if it does not exist.
         echo
         echo For a proper log and result confirmation use the MailStore GUI
@@ -76,12 +77,12 @@ for %%P in (%PROFILES%) do (
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec 10 -MaxWaitMin 30
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30
 
     if errorlevel 1 (
       echo WARNING: Wait for MailStore profile %%~P timed out or failed >> "!LOGFILE!"
     ) else (
-      echo Profile %%~P appears finished (no DB writes for %idleSec% seconds) >> "!LOGFILE!"
+      echo Profile %%~P appears finished ^(no DB writes for %idleSec% seconds^) >> "!LOGFILE!"
     )
 
     rem small pause to let MailStore settle
