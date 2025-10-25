@@ -38,12 +38,11 @@ $startTime = $referenceTime = Get-Date
 Write-Verbose "Give time to the first change to happen "
 Start-Sleep -Seconds $IdleSec
 
-if (!($lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-$lastWriteTime =  $lastModifiedFile.LastWriteTime)){
+if (!($lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
     Write-Warning "No files found in $Folder matching patterns: $($Patterns -join ', ')"
     exit 1
 }
-
+$lastWriteTime =  $lastModifiedFile.LastWriteTime
 Write-Verbose $lastModifiedFile
 
 while ( $lastWriteTime -gt $referenceTime){
@@ -60,8 +59,8 @@ while ( $lastWriteTime -gt $referenceTime){
     }
 }
 
-$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime |
- Select-Object -Last 6 | Out-File -FilePath .\LastModified.txt
+#$lastModifiedFile = 
+Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 6 | Out-File -FilePath .\LastModified.txt
 Write-Verbose "Folder idle for more tan $IdleSec seconds"
 
 exit 0

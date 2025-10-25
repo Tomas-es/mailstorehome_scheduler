@@ -31,8 +31,11 @@ param(
 $proc = Get-Process -Name "$ProcessName" -ErrorAction SilentlyContinue
 if (! $proc) { exit 0 }  # It's not running
 
-# Ask a clean close
-$proc.CloseMainWindow()  
+# Ask a clean close. Wait and ask again to close parent window
+$proc.CloseMainWindow()
+Start-Sleep -Seconds 5
+$proc.Refresh()
+$proc.CloseMainWindow()
 
 # Optional: wait and, if still running, force kill
 if (! $proc.WaitForExit($WaitSeconds)) {
