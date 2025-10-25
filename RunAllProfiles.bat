@@ -38,8 +38,9 @@ if exist %MAILSTORE%\*.lock (
 )
 
 rem List of profile IDs to run (space-separated)
+rem Example: set "PROFILES=1 2 3"
 set "PROFILES=1"
-set idleSec=10
+set idleSec=20
 rem Date format: YYYY-MM-DD_HH-MM-SS
 set DATESTAMP=%DATE:~-4%-%DATE:~3,2%-%DATE:~0,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~6,2%
 rem Replace space with 0 in hour if needed, so there are always two digits and no leading space
@@ -61,6 +62,7 @@ for %%P in (%PROFILES%) do (
     rem Run MailStore command line
     echo Starting MailStore profile %%~P >> "!LOGFILE!" 2>&1
     start "" %MAILSTORE% /c archive -id="%%~P"
+    rem Wait a few seconds to allow MailStore to start properly
     timeout /t 5 /nobreak
     rem Note: ERRORLEVEL is always 0 here because 'start' launches the program and returns immediately.
         (
@@ -71,13 +73,13 @@ for %%P in (%PROFILES%) do (
         echo and check the profile log there.
     ) >> "!LOGFILE!" 2>&1
 
-    rem Wait until MailStore data directory is idle (no file writes) for 10 seconds, max wait 30 minutes.
+    rem Wait until MailStore data directory is idle (no file writes) for %idleSec% seconds, max wait 30 minutes.
     rem Adjust $folder if your MailStore data lives elsewhere.
     rem The following PowerShell command monitors the MailStore data directory for file write activity.
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
-    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30'
+    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 120'
     powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30
 
     if errorlevel 1 (

@@ -12,14 +12,14 @@ Returns 1 on timeout or error.
 Path to the MailStore data folder. Default: $env:USERPROFILE\Documents\MailStore Home
 
 .PARAMETER IdleSec
-Number of seconds with no file writes required to consider the folder idle. Default: 10
+Number of seconds with no file writes required to consider the folder idle. Default: 20
 
 .PARAMETER MaxWaitMin
-Maximum number of minutes to wait before timing out. Default: 30
+Maximum number of minutes to wait before timing out. Default: 120
 Keeps the script from waiting indefinitely.
 
 .PARAMETER Patterns
-Array of glob patterns to include when checking files. Default: *.dat,*.fdb,*.rr,*.key,Index*.dat
+Array of glob patterns to include when checking files. Default: *.lock','*.fdb','*.key','Index*.dat
 
 .EXAMPLE
 PS> .\WaitForMailStoreIdle.ps1 -Folder "$env:USERPROFILE\Documents\MailStore Home" -IdleSec 10 -MaxWaitMin 30
@@ -28,12 +28,12 @@ PS> .\WaitForMailStoreIdle.ps1 -Folder "$env:USERPROFILE\Documents\MailStore Hom
 [CmdletBinding()]
 param(
     [string]$Folder = "D:\MailStoreAdministrador",
-    [int]$IdleSec = 10,
-    [int]$MaxWaitMin = 3,
+    [int]$IdleSec = 20,
+    [int]$MaxWaitMin = 120,
     [string[]]$Patterns = @('*.lock','*.fdb','*.key','Index*.dat')
 )
 
-$referenceTime = Get-Date
+$startTime = $referenceTime = Get-Date
 # Give time to the first change to happen 
 Write-Verbose "Give time to the first change to happen "
 Start-Sleep -Seconds $IdleSec
@@ -43,12 +43,14 @@ $lastWriteTime =  $lastModifiedFile.LastWriteTime
 Write-Verbose $lastModifiedFile
 
 while ( $lastWriteTime -gt $referenceTime){
-	Start-Sleep -Seconds 5
+	Start-Sleep -Seconds 20
     $referenceTime = $lastWriteTime
 	$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1
 	$lastWriteTime =  $lastModifiedFile.LastWriteTime
 	Write-Verbose $lastModifiedFile
-    if ( (Get-Date) -gt ( $lastWriteTime.AddMinutes($MaxWaitMin) ) ){
+    # Check for timeout to avoid infinite loop
+    # You should not get here normally because idle time should be reached
+    if ( (Get-Date) -gt ( $startTime.AddMinutes($MaxWaitMin) ) ){
         Write-Warning "Timeout waiting for folder to be idle"
         exit 1
     }
