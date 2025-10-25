@@ -38,14 +38,14 @@ $referenceTime = Get-Date
 Write-Verbose "Give time to the first change to happen "
 Start-Sleep -Seconds $IdleSec
 
-$lastModifiedFile = Get-ChildItem -Path D:\MailStoreAdministrador | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1
 $lastWriteTime =  $lastModifiedFile.LastWriteTime
 Write-Verbose $lastModifiedFile
 
 while ( $lastWriteTime -gt $referenceTime){
 	Start-Sleep -Seconds 5
     $referenceTime = $lastWriteTime
-	$lastModifiedFile = Get-ChildItem -Path D:\MailStoreAdministrador | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+	$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1
 	$lastWriteTime =  $lastModifiedFile.LastWriteTime
 	Write-Verbose $lastModifiedFile
     if ( (Get-Date) -gt ( $lastWriteTime.AddMinutes($MaxWaitMin) ) ){
@@ -54,7 +54,7 @@ while ( $lastWriteTime -gt $referenceTime){
     }
 }
 
-$lastModifiedFile = Get-ChildItem -Path D:\MailStoreAdministrador | Sort-Object -Property LastWriteTime |
+$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime |
  Select-Object -Last 6 | Out-File -FilePath .\LastModified.txt
 Write-Verbose "Folder idle for more tan $IdleSec seconds"
 

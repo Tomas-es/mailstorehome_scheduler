@@ -77,6 +77,7 @@ for %%P in (%PROFILES%) do (
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
+    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30'
     powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%USERPROFILE%\Documents\MailStore Home" -IdleSec %idleSec% -MaxWaitMin 30
 
     if errorlevel 1 (
