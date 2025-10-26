@@ -39,7 +39,7 @@ if not exist "%MAILSTOREDATA%" (
 )
 
 rem Last exited
-if exist %MAILSTOREDATA%\*.lock (
+if exist "%MAILSTOREDATA%\*.lock" (
     echo  WARNING: Last MailStore exit was not clean. A .lock file exists in %MAILSTORE%.
     echo  This may indicate that MailStore is already running or was not closed properly.
     set LOCKFOUND=Last MailStore exit was not clean
