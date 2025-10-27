@@ -61,10 +61,13 @@ for %%P in (%PROFILES%) do (
     set "LOGFILE=%LOGDIR%\PROFILE_%%~P_%DATESTAMP%.log"
     echo %LOCKFOUND%> "!LOGFILE!" 2>&1
 
+    rem trick %time% to get updated value
+    call set CURRTIME=%%TIME%%
+
     (
         echo ======================================================
         echo Running profile: %%~P
-        echo Start time: %DATE% %TIME%
+        echo Start time: %DATE% !CURRTIME!
         echo ======================================================
     ) >> "!LOGFILE!"
 
@@ -100,9 +103,11 @@ for %%P in (%PROFILES%) do (
     rem small pause to let MailStore settle
     timeout /t 2 /nobreak >nul
 
+    rem trick %time% to get updated value
+    call set CURRTIME=%%TIME%%
     (
         echo Result: !RESULT!
-        echo End time: %DATE% %TIME%
+        echo End time: %DATE% !CURRTIME!
         echo.
     ) >> "!LOGFILE!"
 
@@ -113,7 +118,7 @@ for %%P in (%PROFILES%) do (
 
 # Out of the loop
 # Is enough to close once
-powershell.exe -ExecutionPolicy Bypass -File .\close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
+powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
     if errorlevel 1 (
       echo WARNING: Close-MainWindow.ps1 reported an error
     ) else (
