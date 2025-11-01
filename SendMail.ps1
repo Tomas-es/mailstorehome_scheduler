@@ -1,3 +1,6 @@
+<#
+    $LogFile needs a default to match old correo.exe behavior
+#>
 param (
     [string]$ProfileName,
     [string]$Result,

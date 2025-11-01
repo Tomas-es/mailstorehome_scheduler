@@ -107,7 +107,7 @@ for %%P in (%PROFILES%) do (
     ) >> "!LOGFILE!"
 
     rem Send email log. Inside the loop to send after each profile.
-    rem powershell.exe -ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!"
+    rem pwsh.exe -ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!"
     echo "-ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!""
     powershell.exe -ExecutionPolicy Bypass -File .\close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
     if errorlevel 1 (
