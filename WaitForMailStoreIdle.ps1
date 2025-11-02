@@ -30,7 +30,7 @@ param(
     [string]$Folder = "D:\MailStoreAdministrador",
     [int]$IdleSec = 20,
     [int]$MaxWaitMin = 120,
-    [string[]]$Patterns = @('*.lock','*.fdb','*.key','Index*.dat')
+    [string[]]$Patterns = @('*.lock','*.fdb','*.key','Index*.dat', '*.rr', '*.dat')
 )
 
 $startTime = $referenceTime = Get-Date
