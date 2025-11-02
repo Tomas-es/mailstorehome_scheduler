@@ -87,12 +87,18 @@ if (! $proc) {
     exit 0
 }  # It's not running
 
+if $proc -is [System.Array] {
+    # Multiple processes found, take the first one
+    $proc = $proc[0]
+    "Multiple instances of $ProcessName found. Operating on PID: $($proc.Id)" | Write-Log -Level WARN
+}   
+
 # Ask a clean close. Wait and ask again to close parent window
 "Closing main window of $ProcessName (PID: $($proc.Id))" | Write-Log -Level INFO
 $proc.CloseMainWindow()
 Start-Sleep -Seconds 5
 "Checking if $ProcessName is still running after CloseMainWindow" | Write-Log -Level INFO
-if ($proc.Refresh()) {
+if ($proc = Get-Process -Name "$ProcessName" -ErrorAction SilentlyContinue) {
     "Process $ProcessName is still running. Attempting to close main window again." | Write-Log -Level WARN
     $proc.CloseMainWindow()
 } else {
