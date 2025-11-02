@@ -91,8 +91,8 @@ for %%P in (%PROFILES%) do (
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
-    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 120'
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0WaitForMailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 30
+    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 120'
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 30 -Verbose
 
     if errorlevel 1 (
       echo WARNING: Wait for MailStore profile %%~P timed out or failed >> "!LOGFILE!"
@@ -116,8 +116,8 @@ for %%P in (%PROFILES%) do (
     echo "-ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!""
 )
 
-# Out of the loop
-# Is enough to close once
+rem Out of the loop
+rem Is enough to close once
 powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
     if errorlevel 1 (
       echo WARNING: Close-MainWindow.ps1 reported an error

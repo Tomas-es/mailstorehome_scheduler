@@ -13,6 +13,6 @@ SendMail.ps1
 	Not tested, just a scrtach
 test_run_all_profiles.bat
 	Just for test purposes
-WaitForMailStoreIdle.ps1
+Wait-MailStoreIdle.ps1
 	Try to guess when MailStore finishes with the porfile archive
 

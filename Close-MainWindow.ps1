@@ -87,8 +87,9 @@ if (! $proc) {
     exit 0
 }  # It's not running
 
-if $proc -is [System.Array] {
+if ($proc -is [System.Array]) {
     # Multiple processes found, take the first one
+    # If this happens often, consider improving the the rest of the script to handle multiple instances
     $proc = $proc[0]
     "Multiple instances of $ProcessName found. Operating on PID: $($proc.Id)" | Write-Log -Level WARN
 }   

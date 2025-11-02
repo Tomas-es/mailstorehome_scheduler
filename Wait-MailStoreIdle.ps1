@@ -19,10 +19,10 @@ Maximum number of minutes to wait before timing out. Default: 120
 Keeps the script from waiting indefinitely.
 
 .PARAMETER Patterns
-Array of glob patterns to include when checking files. Default: *.lock','*.fdb','*.key','Index*.dat
+Array of glob patterns to include when checking files. Default: *.lock','*.fdb','*.key','Index*.dat, '*.rr', '*.dat'
 
 .EXAMPLE
-PS> .\WaitForMailStoreIdle.ps1 -Folder "$env:USERPROFILE\Documents\MailStore Home" -IdleSec 10 -MaxWaitMin 30
+PS> .\Wait-MailStoreIdle.ps1 -Folder "$env:USERPROFILE\Documents\MailStore Home" -IdleSec 10 -MaxWaitMin 30
 #>
 
 [CmdletBinding()]
@@ -38,12 +38,12 @@ $startTime = $referenceTime = Get-Date
 Write-Verbose "Give time to the first change to happen "
 Start-Sleep -Seconds $IdleSec
 
-if (!($lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
+if (!($lastModifiedFile = Get-ChildItem -Path $Folder -File | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
     Write-Warning "No files found in $Folder matching patterns: $($Patterns -join ', ')"
     exit 1
 }
 $lastWriteTime =  $lastModifiedFile.LastWriteTime
-Write-Verbose $lastModifiedFile
+Write-Verbose "Last modifed file: $($lastModifiedFile)"
 
 while ( $lastWriteTime -gt $referenceTime){
 	Start-Sleep -Seconds 20
