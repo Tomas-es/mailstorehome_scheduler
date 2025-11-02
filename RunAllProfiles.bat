@@ -54,6 +54,15 @@ set DATESTAMP=%DATE:~-4%-%DATE:~3,2%-%DATE:~0,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~
 rem Replace space with 0 in hour if needed, so there are always two digits and no leading space
 set DATESTAMP=%DATESTAMP: =0%
 
+rem === Close MailStore if running ===
+rem This will keep the MailStore Home task windows from growing indefinitely
+echo Checking for running MailStore instances to close...
+powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
+    if errorlevel 1 (
+      echo WARNING: Close-MainWindow.ps1 reported an error
+    ) else (
+      echo Close-MainWindow.ps1 completed successfully
+    )
 
 rem === Loop through profiles ===
 for %%P in (%PROFILES%) do (
@@ -117,12 +126,8 @@ for %%P in (%PROFILES%) do (
 )
 
 rem Out of the loop
+rem This is a placeholder for Close-MainWindow.ps1 when tested
 rem Is enough to close once
-powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
-    if errorlevel 1 (
-      echo WARNING: Close-MainWindow.ps1 reported an error
-    ) else (
-      echo Close-MainWindow.ps1 completed successfully
-    )
+
 
 endlocal

@@ -33,34 +33,50 @@ param(
     [string[]]$Patterns = @('*.lock','*.fdb','*.key','Index*.dat', '*.rr', '*.dat')
 )
 
+if ( Test-Path -Path $PSScriptRoot\Write-Log.psm1 ) {
+    Import-Module $PSScriptRoot\Write-Log.psm1 -NoClobber
+} else {
+    Set-Content -Path $PSScriptRoot\Wait-MailStoreIdle.txt -Value "Write-Log.psm1 module not found in $PSScriptRoot. Logging will be limited."
+}
+Import-Module $PSScriptRoot\Write-Log.psm1 -NoClobber
+function Write-IdleLog {
+    param (
+        [object]$Message,
+        [string]$Level = 'INFO',
+        [string]$FilePath = (Join-Path $PSScriptRoot 'Wait-MailStoreIdle.log')
+    )
+    Write-Log -Message $Message -Level $Level -FilePath $FilePath    
+}
+Write-IdleLog "Starting Wait-MailStoreIdle for folder $Folder, idle sec: $IdleSec, max wait min: $MaxWaitMin" 'INFO'
+
 $startTime = $referenceTime = Get-Date
 # Give time to the first change to happen 
-Write-Verbose "Give time to the first change to happen "
+Write-IdleLog -Message "Give time to the first change to happen " -Level 'INFO'
 Start-Sleep -Seconds $IdleSec
 
 if (!($lastModifiedFile = Get-ChildItem -Path $Folder -File | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
-    Write-Warning "No files found in $Folder matching patterns: $($Patterns -join ', ')"
+    Write-IdleLog -Message "No files found in $Folder matching patterns: $($Patterns -join ', ')" -Level 'ERROR'
     exit 1
 }
 $lastWriteTime =  $lastModifiedFile.LastWriteTime
-Write-Verbose "Last modifed file: $($lastModifiedFile)"
+Write-IdleLog -Message "Last modifed file: $($lastModifiedFile)" -Level 'INFO'
 
 while ( $lastWriteTime -gt $referenceTime){
 	Start-Sleep -Seconds 20
     $referenceTime = $lastWriteTime
 	$lastModifiedFile = Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 1
 	$lastWriteTime =  $lastModifiedFile.LastWriteTime
-	Write-Verbose $lastModifiedFile
+	Write-IdleLog -Message $lastModifiedFile -Level 'DEBUG'
     # Check for timeout to avoid infinite loop
     # You should not get here normally because idle time should be reached
     if ( (Get-Date) -gt ( $startTime.AddMinutes($MaxWaitMin) ) ){
-        Write-Warning "Timeout waiting for folder to be idle"
+        Write-IdleLog -Message "Timeout waiting for folder to be idle" -Level 'WARN'
         exit 1
     }
 }
 
 #$lastModifiedFile = 
 Get-ChildItem -Path $Folder | Sort-Object -Property LastWriteTime | Select-Object -Last 6 | Out-File -FilePath .\LastModified.txt
-Write-Verbose "Folder idle for more tan $IdleSec seconds"
+Write-IdleLog -Message "Folder idle for more tan $IdleSec seconds" -Level 'INFO'
 
 exit 0
