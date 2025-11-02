@@ -10,11 +10,11 @@ If the process does not exit within the specified wait time, it forcefully termi
 .PARAMETER ProcessName
 Name of the process to close. Default is "MailStoreHome".
 
-.PARAMETER WaitSeconds
-Number of seconds to wait for the process to exit after requesting a close. Default is 100.
+.PARAMETER WaitMiliSeconds
+Number of miliseconds to wait for the process to exit after requesting a close. Default is 3000.
 
 .EXAMPLE
-PS> .\Close-MainWindow.ps1  -ProcessName "MailStoreHome" -WaitSeconds 30
+PS> .\Close-MainWindow.ps1  -ProcessName "MailStoreHome" -WaitMiliSeconds 3000
 
 .EXAMPLE
 PS> .\Close-MainWindow.ps1  # Uses defaults
@@ -26,7 +26,7 @@ Written for MailStore Home log maintenance.
 
 param(
     [string]$ProcessName = "MailStoreHome",
-    [int]$WaitSeconds = 100
+    [int]$WaitMiliSeconds = 3000
 )
 
 $LogFile = Join-Path $PSScriptRoot '\Close-MainWindow.log'
@@ -99,7 +99,7 @@ if ($proc -is [System.Array]) {
 $proc.CloseMainWindow()
 Start-Sleep -Seconds 5
 "Checking if $ProcessName is still running after CloseMainWindow" | Write-Log -Level INFO
-if ($proc = Get-Process -Name "$ProcessName" -ErrorAction SilentlyContinue) {
+if ($proc = Get-Process -Name "$ProcessName") {
     "Process $ProcessName is still running. Attempting to close main window again." | Write-Log -Level WARN
     $proc.CloseMainWindow()
 } else {
@@ -109,14 +109,14 @@ if ($proc = Get-Process -Name "$ProcessName" -ErrorAction SilentlyContinue) {
 
 
 # Optional: wait and, if still running, force kill
-if (! $proc.WaitForExit($WaitSeconds)) {
+if ( $proc.WaitForExit($WaitMiliSeconds)) {
     exit 0
 } else {
-    "Process $ProcessName is still running after waiting $WaitSeconds seconds. Forcing termination." | Write-Log -Level WARN
+    "Process $ProcessName is still running after waiting $WaitMiliSeconds seconds. Forcing termination." | Write-Log -Level WARN
     $proc.Kill()
 }
 
-if (! $proc.WaitForExit($WaitSeconds)) {
+if (! $proc.WaitForExit($WaitMiliSeconds)) {
     Write-Warning "Process $ProcessName did not exit after Kill."
     "Process $ProcessName did not exit after Kill." | Write-Log -Level ERROR
     exit 1

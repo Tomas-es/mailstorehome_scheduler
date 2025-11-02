@@ -57,7 +57,7 @@ set DATESTAMP=%DATESTAMP: =0%
 rem === Close MailStore if running ===
 rem This will keep the MailStore Home task windows from growing indefinitely
 echo Checking for running MailStore instances to close...
-powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitSeconds 30
+powershell.exe -ExecutionPolicy Bypass -File .\Close-MainWindow.ps1 -ProcessName "MailStoreHome" -WaitMiliSeconds 3000
     if errorlevel 1 (
       echo WARNING: Close-MainWindow.ps1 reported an error
     ) else (
@@ -122,7 +122,7 @@ for %%P in (%PROFILES%) do (
 
     rem Send email log. Inside the loop to send after each profile.
     rem pwsh.exe -ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!"
-    echo "-ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!""
+    rem echo "-ExecutionPolicy Bypass -File "%MAILSCRIPT%" -ProfileName "%%~P" -Result "%RESULT%" -LogFile "!LOGFILE!""
 )
 
 rem Out of the loop
