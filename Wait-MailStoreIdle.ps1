@@ -38,7 +38,7 @@ if ( Test-Path -Path $PSScriptRoot\Write-Log.psm1 ) {
 } else {
     Set-Content -Path $PSScriptRoot\Wait-MailStoreIdle.txt -Value "Write-Log.psm1 module not found in $PSScriptRoot. Logging will be limited."
 }
-Import-Module $PSScriptRoot\Write-Log.psm1 -NoClobber
+
 function Write-IdleLog {
     param (
         [object]$Message,
