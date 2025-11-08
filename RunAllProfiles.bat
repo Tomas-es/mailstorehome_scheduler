@@ -71,12 +71,11 @@ for %%P in (%PROFILES%) do (
     echo %LOCKFOUND%> "!LOGFILE!" 2>&1
 
     rem trick %time% to get updated value
-    call set CURRTIME=%%TIME%%
-
+    
     (
         echo ======================================================
         echo Running profile: %%~P
-        echo Start time: %DATE% !CURRTIME!
+        echo Start time: !DATE! !TIME!
         echo ======================================================
     ) >> "!LOGFILE!"
 
@@ -113,10 +112,10 @@ for %%P in (%PROFILES%) do (
     timeout /t 2 /nobreak >nul
 
     rem trick %time% to get updated value
-    call set CURRTIME=%%TIME%%
+    
     (
         echo Result: !RESULT!
-        echo End time: %DATE% !CURRTIME!
+        echo End time: !DATE! !TIME!
         echo.
     ) >> "!LOGFILE!"
 
