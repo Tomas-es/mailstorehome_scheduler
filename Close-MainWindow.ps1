@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Close the main window of a specified process and optionally force kill it after a timeout.
+Close the main window of a specified process and optionally force kill after a timeout.
 
 .DESCRIPTION
 As a graceful way to close MailStore Home before running profiles, this script attempts to close the main window of the specified process.
@@ -29,13 +29,21 @@ param(
     [int]$WaitMiliSeconds = 3000
 )
 
-$LogFile = Join-Path $PSScriptRoot '\Close-MainWindow.log'
-Set-Content -Path $LogFile -Value "[$(Get-Date -Format o)] Starting Close-MainWindow for process $ProcessName" -Encoding UTF8
-# Define once (put in a module or at top of script)
+# Check for Write-Log module file to import
+if ( Test-Path -Path $PSScriptRoot\Write-Log.psm1 ) {
+    Import-Module $PSScriptRoot\Write-Log.psm1 -NoClobber
+} else {
+    Set-Content -Path $PSScriptRoot\Wait-MailStoreIdle.txt -Value "Write-Log.psm1 module not found in $PSScriptRoot. Logging will be limited."
+}
 
-function Write-Log {
-    [CmdletBinding()]
-    param(
+# Check for existing log file and clear it
+$LogFile = Join-Path $PSScriptRoot '\Close-MainWindow.log'
+if ( Test-Path $LogFile) {
+    Set-Content -Path $LogFile -Encoding UTF8 -Value "Log cleared on $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+}
+
+function Write-CloseWindowLog {
+    param (
         [Parameter(ValueFromPipeline=$true, Position=0)]
         [object]$Message,
 
@@ -46,44 +54,16 @@ function Write-Log {
         [Parameter()]
         [string]$FilePath = $LogFile
     )
-
-    begin {
-        $buffer = [System.Collections.Generic.List[string]]::new()
-    }
-
-    process {
-        if ($null -eq $Message) { return }
-
-        # If a complex object arrives, get its formatted text
-        $textLines = if ($Message -is [string]) {
-            $Message -split "`n"
-        } else {
-            $Message | Out-String -Stream
-        }
-
-        $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-        foreach ($line in $textLines) {
-            $buffer.Add("$timestamp [$Level] $line")
-        }
-
-        # Optional: flush periodically to avoid high memory usage
-        if ($buffer.Count -ge 200) {
-            $buffer | Add-Content -Path $FilePath -Encoding UTF8
-            $buffer.Clear()
-        }
-    }
-
-    end {
-        if ($buffer.Count -gt 0) {
-            $buffer | Add-Content -Path $FilePath -Encoding UTF8
-        }
-    }
+    Write-Log -Message $Message -Level $Level -FilePath $FilePath    
 }
+Write-CloseWindowLog "Starting Close-MainWindow aaaaaa for process $ProcessName" -Level 'INFO'
+"Test pipe string" | Write-CloseWindowLog -Level 'DEBUG'
+
 
 # Obtener proceso
 $proc = Get-Process -Name "$ProcessName" -ErrorAction SilentlyContinue
 if (! $proc) {
-    "$ProcessName is not running." | Write-Log -Level INFO
+    "$ProcessName is not running." | Write-CloseWindowLog -Level INFO
     exit 0
 }  # It's not running
 
@@ -91,19 +71,19 @@ if ($proc -is [System.Array]) {
     # Multiple processes found, take the first one
     # If this happens often, consider improving the the rest of the script to handle multiple instances
     $proc = $proc[0]
-    "Multiple instances of $ProcessName found. Operating on PID: $($proc.Id)" | Write-Log -Level WARN
+    "Multiple instances of $ProcessName found. Operating on PID: $($proc.Id)" | Write-CloseWindowLog -Level WARN
 }   
 
 # Ask a clean close. Wait and ask again to close parent window
-"Closing main window of $ProcessName (PID: $($proc.Id))" | Write-Log -Level INFO
+"Closing main window of $ProcessName (PID: $($proc.Id))" | Write-CloseWindowLog -Level INFO
 $proc.CloseMainWindow()
 Start-Sleep -Seconds 5
-"Checking if $ProcessName is still running after CloseMainWindow" | Write-Log -Level INFO
+"Checking if $ProcessName is still running after CloseMainWindow" | Write-CloseWindowLog -Level INFO
 if ($proc = Get-Process -Name "$ProcessName") {
-    "Process $ProcessName is still running. Attempting to close main window again." | Write-Log -Level WARN
+    "Process $ProcessName is still running. Attempting to close main window again." | Write-CloseWindowLog -Level WARN
     $proc.CloseMainWindow()
 } else {
-    "Process $ProcessName has exited after CloseMainWindow." | Write-Log -Level INFO
+    "Process $ProcessName has exited after CloseMainWindow." | Write-CloseWindowLog -Level INFO
     exit 0
 }
 
@@ -112,12 +92,12 @@ if ($proc = Get-Process -Name "$ProcessName") {
 if ( $proc.WaitForExit($WaitMiliSeconds)) {
     exit 0
 } else {
-    "Process $ProcessName is still running after waiting $WaitMiliSeconds seconds. Forcing termination." | Write-Log -Level WARN
+    "Process $ProcessName is still running after waiting $WaitMiliSeconds seconds. Forcing termination." | Write-CloseWindowLog -Level WARN
     $proc.Kill()
 }
 
 if (! $proc.WaitForExit($WaitMiliSeconds)) {
     Write-Warning "Process $ProcessName did not exit after Kill."
-    "Process $ProcessName did not exit after Kill." | Write-Log -Level ERROR
+    "Process $ProcessName did not exit after Kill." | Write-CloseWindowLog -Level ERROR
     exit 1
 }
