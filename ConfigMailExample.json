@@ -1,0 +1,7 @@
+{
+  "email": "from@mail.com",
+  "destinationEmail": "to@mail.com",
+  "smtpServer": "smtp.server.com",
+  "smtpPort": 587,
+  "PasswordPath": "C:\\MailStore\\smtp_password.txt"
+}
