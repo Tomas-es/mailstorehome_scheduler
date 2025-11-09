@@ -54,7 +54,7 @@ $startTime = $referenceTime = Get-Date
 Write-IdleLog -Message "Give time to the first change to happen " -Level 'INFO'
 Start-Sleep -Seconds $IdleSec
 
-if (!($lastModifiedFile = Get-ChildItem -Path $Folder -File | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
+if (!($lastModifiedFile = Get-ChildItem -Path $Folder -Filter $Pattern | Sort-Object -Property LastWriteTime | Select-Object -Last 1)){
     Write-IdleLog -Message "No files found in $Folder matching patterns: $($Patterns -join ', ')" -Level 'ERROR'
     exit 1
 }

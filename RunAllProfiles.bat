@@ -1,11 +1,43 @@
-@echo off
+rem @echo off
 setlocal enabledelayedexpansion
 
-rem === Configuration ===
-set MAILSTORE="C:\Program Files (x86)\MailStore\MailStore Home\MailStoreHome.exe"
-set LOGDIR=C:\MailStore\Logs
-set MAILSCRIPT=C:\MailStore\SendMail.ps1
-set "MAILSTOREDATA=%USERPROFILE%\Documents\MailStore Home"
+
+rem === Load configuration from config.cfg ===
+
+rem Use name value pairs, one per line, in the format:
+rem VARIABLE="VALUE"
+rem Do not use spaces around the equals sign.
+rem Try not to use special characters in the values. Quotes are optional but 
+rem recommended for paths with spaces.
+rem The VALUES will correspond to everything after the first equals sign. 
+rem Remember to modify this script if you need to parse more values.
+
+rem Verify config.cfg exists
+if not exist %~dp0config.cfg (
+    echo ERROR: Configuration file config.cfg not found.
+    echo Please verify the path in this script and that config.cfg is
+    echo properly set.
+    exit /b 1
+)
+
+for /f "usebackq tokens=1,* delims==" %%A in ("config.cfg") do (
+    set "%%A=%%B"
+)
+
+
+rem A second pass to resolve any environment variables in the values
+call set MAILSTORE=%MAILSTORE%
+call set LOGDIR=%LOGDIR%
+call set MAILSCRIPT=%MAILSCRIPT%
+call set MAILSTOREDATA=%MAILSTOREDATA%
+
+
+:: Use the variables
+echo MAILSTORE: %MAILSTORE%
+echo LOGDIR: %LOGDIR%
+echo MAILSCRIPT: %MAILSCRIPT%
+echo MAILSTOREDATA: %MAILSTOREDATA%
+
 
 rem === Verify configured paths exist ===
 rem MailStore executable
@@ -16,7 +48,7 @@ if not exist %MAILSTORE% (
 )
 
 rem Log directory: create if missing (fail if creation fails)
-if not exist "%LOGDIR%" (
+if not exist %LOGDIR% (
     echo Log directory "%LOGDIR%" does not exist. Attempting to create...
     mkdir "%LOGDIR%" 2>nul || (
         echo ERROR: Failed to create log directory "%LOGDIR%"
@@ -25,14 +57,14 @@ if not exist "%LOGDIR%" (
 )
 
 rem Mail script
-if not exist "%MAILSCRIPT%" (
+if not exist %MAILSCRIPT% (
     echo ERROR: Mail script not found: "%MAILSCRIPT%"
     echo Please ensure SendMail.ps1 exists at the configured path.
     exit /b 1
 )
 
 rem MailStore data directory
-if not exist "%MAILSTOREDATA%" (
+if not exist %MAILSTOREDATA% (
     echo ERROR: MailStore data directory not found: "%MAILSTOREDATA%"
     echo Please verify MailStore is installed and the path is correct.
     exit /b 1
@@ -99,8 +131,8 @@ for %%P in (%PROFILES%) do (
     rem It checks the latest write time of relevant files every 5 seconds and waits until no writes occur for 10 seconds.
     rem If the directory is idle for 10 seconds, it exits with success; otherwise, it times out after 30 minutes.
     rem Call external PowerShell script to wait for MailStore data directory to be idle
-    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 120'
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder "%MAILSTOREDATA%" -IdleSec %idleSec% -MaxWaitMin 30 -Verbose
+    echo '-NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder %MAILSTOREDATA% -IdleSec %idleSec% -MaxWaitMin 120'
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Wait-MailStoreIdle.ps1" -Folder %MAILSTOREDATA% -IdleSec %idleSec% -MaxWaitMin 30 -Verbose
 
     if errorlevel 1 (
       echo WARNING: Wait for MailStore profile %%~P timed out or failed >> "!LOGFILE!"
