@@ -1,0 +1,7 @@
+{
+  "email": "copias@ajsoluciones.es",
+  "destinationEmail": "officeremoto@gmail.com",
+  "smtpServer": "smtp.ionos.es",
+  "smtpPort": 587,
+  "PasswordPath": "C:\\MailStore\\smtp_password.txt"
+}
