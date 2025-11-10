@@ -25,7 +25,7 @@ $message.Body = $builder.ToMessageBody()
 
 # Send the message
 $client = New-Object MailKit.Net.Smtp.SmtpClient
-$client.Connect($smtpServer, $smtpPort, [MailKit.Security.SecureSocketOptions]::StartTls)
+$client.Connect($smtpServer, $smtpPort, [MailKit.Security.SecureSocketOptions]::SslOnConnect)
 # Secure modifiation to read password from file
 $securePassword = Get-Content -Path $PasswordPath | ConvertTo-SecureString
 $credential = New-Object System.Management.Automation.PSCredential ($email, $securePassword)
