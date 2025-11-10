@@ -3,5 +3,9 @@
   "destinationEmail": "to@mail.com",
   "smtpServer": "smtp.server.com",
   "smtpPort": 587,
-  "PasswordPath": "C:\\MailStore\\smtp_password.txt"
+  "PasswordPath": "C:\\MailStore\\smtp_password.txt",
+  "attachments": [
+    "C:\\MailStore\\Logs\\log1.txt",
+    "C:\\MailStore\\Logs\\log2.txt"
+  ]
 }
