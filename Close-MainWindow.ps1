@@ -11,10 +11,10 @@ If the process does not exit within the specified wait time, it forcefully termi
 Name of the process to close. Default is "MailStoreHome".
 
 .PARAMETER WaitMiliSeconds
-Number of miliseconds to wait for the process to exit after requesting a close. Default is 3000.
+Number of miliseconds to wait for the process to exit after requesting a close. Default is 30000.
 
 .EXAMPLE
-PS> .\Close-MainWindow.ps1  -ProcessName "MailStoreHome" -WaitMiliSeconds 3000
+PS> .\Close-MainWindow.ps1  -ProcessName "MailStoreHome" -WaitMiliSeconds 30000
 
 .EXAMPLE
 PS> .\Close-MainWindow.ps1  # Uses defaults
@@ -26,7 +26,7 @@ Written for MailStore Home log maintenance.
 
 param(
     [string]$ProcessName = "MailStoreHome",
-    [int]$WaitMiliSeconds = 3000
+    [int]$WaitMiliSeconds = 30000
 )
 
 # Check for Write-Log module file to import
